@@ -30,8 +30,8 @@ function validateName(n) {
   return !/[^a-zA-ZÀ-ÿ\s.\-']/.test(n);
 }
 
-const cnpjValidator = { options: v => { if (!validateCNPJ(v)) throw new Error('CNPJ inválido (dígitos não conferem).'); return true; } };
-const cpfValidator = { options: v => { if (!validateCPF(v)) throw new Error('CPF inválido (dígitos não conferem).'); return true; } };
+const cnpjValidator = { options: v => { if (!validateCNPJ(v)) throw new Error('CNPJ inválido.'); return true; } };
+const cpfValidator = { options: v => { if (!validateCPF(v)) throw new Error('CPF inválido.'); return true; } };
 const nameValidator = { options: v => { if (!validateName(v)) throw new Error('Nome inválido.'); return true; } };
 
 module.exports = { validateCNPJ, validateCPF, validateName, cnpjValidator, cpfValidator, nameValidator };

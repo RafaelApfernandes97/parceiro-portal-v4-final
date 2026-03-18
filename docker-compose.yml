@@ -1,15 +1,33 @@
-version: "3.8"
-
 services:
   backend:
     build: ./backend
-    container_name: parceiro-backend
+    container_name: partner-backend
     restart: always
-    env_file:
-      - ./backend/.env
     environment:
       - NODE_ENV=production
       - FRONTEND_URL=*
+      - PORT=3000
+      - MONGO_URI=mongodb://mongo:27017/parceiro-portal
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_SECURE=${SMTP_SECURE:-false}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - SMTP_FROM_NAME=${SMTP_FROM_NAME}
+      - SMTP_FROM_EMAIL=${SMTP_FROM_EMAIL}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - D4SIGN_BASE_URL=${D4SIGN_BASE_URL}
+      - D4SIGN_TOKEN_API=${D4SIGN_TOKEN_API}
+      - D4SIGN_CRYPT_KEY=${D4SIGN_CRYPT_KEY}
+      - D4SIGN_SAFE_UUID=${D4SIGN_SAFE_UUID}
+      - D4SIGN_WEBHOOK_SECRET=${D4SIGN_WEBHOOK_SECRET}
+      - EXTERNAL_API_KEY_PRIMARY=${EXTERNAL_API_KEY_PRIMARY}
+      - EXTERNAL_API_KEY_SECONDARY=${EXTERNAL_API_KEY_SECONDARY}
+      - EXTERNAL_API_KEY_EXPIRY=${EXTERNAL_API_KEY_EXPIRY}
+      - ADMIN_EMAIL_MASTER=${ADMIN_EMAIL_MASTER}
+      - ADMIN_PASSWORD_MASTER=${ADMIN_PASSWORD_MASTER}
     volumes:
       - uploads:/app/uploads
     expose:
@@ -19,7 +37,7 @@ services:
 
   frontend:
     build: ./frontend
-    container_name: parceiro-frontend
+    container_name: partner-frontend
     restart: always
     ports:
       - "80:80"
@@ -28,7 +46,7 @@ services:
 
   mongo:
     image: mongo:7
-    container_name: parceiro-mongo
+    container_name: partner-mongo
     restart: always
     volumes:
       - mongo_data:/data/db

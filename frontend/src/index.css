@@ -1,0 +1,6 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'DM Sans', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; background: #F7F9FB; color: #2A2A2A; }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
 const User = require('../models/User');
 
-// ─── JWT Auth ───
 const auth = async (req, res, next) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
@@ -26,30 +25,18 @@ const partnerOnly = (req, res, next) => {
   next();
 };
 
-// ─── External API Key Auth (with rotation support) ───
 const apiKeyAuth = (req, res, next) => {
   const key = req.header('X-API-Key') || req.query.apiKey;
   if (!key) return res.status(401).json({ error: 'API Key não fornecida.' });
-
   const primary = process.env.EXTERNAL_API_KEY_PRIMARY;
   const secondary = process.env.EXTERNAL_API_KEY_SECONDARY;
   const expiry = process.env.EXTERNAL_API_KEY_EXPIRY;
-
-  // Check expiry
-  if (expiry && new Date() > new Date(expiry)) {
-    return res.status(401).json({ error: 'API Key expirada. Solicite renovação.' });
-  }
-
-  // Accept primary or secondary (for rotation)
-  if (key !== primary && (secondary === 'disabled' || key !== secondary)) {
-    return res.status(401).json({ error: 'API Key inválida.' });
-  }
-
+  if (expiry && new Date() > new Date(expiry)) return res.status(401).json({ error: 'API Key expirada.' });
+  if (key !== primary && (secondary === 'disabled' || key !== secondary)) return res.status(401).json({ error: 'API Key inválida.' });
   req.apiKeyUsed = key === primary ? 'primary' : 'secondary';
   next();
 };
 
-// ─── Rate Limiters ───
 const generalLimiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
   max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
@@ -65,8 +52,7 @@ const authLimiter = rateLimit({
 });
 
 const externalApiLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: 60,
+  windowMs: 60 * 1000, max: 60,
   message: { error: 'Rate limit da API externa atingido. Máximo 60 req/min.' },
   standardHeaders: true, legacyHeaders: false
 });
