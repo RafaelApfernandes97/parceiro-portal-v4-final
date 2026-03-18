@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  backend:
+    build: ./backend
+    container_name: parceiro-backend
+    restart: always
+    env_file:
+      - ./backend/.env
+    environment:
+      - NODE_ENV=production
+      - FRONTEND_URL=*
+    volumes:
+      - uploads:/app/uploads
+    expose:
+      - "3000"
+    depends_on:
+      - mongo
+
+  frontend:
+    build: ./frontend
+    container_name: parceiro-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  mongo:
+    image: mongo:7
+    container_name: parceiro-mongo
+    restart: always
+    volumes:
+      - mongo_data:/data/db
+    expose:
+      - "27017"
+
+volumes:
+  mongo_data:
+  uploads:
