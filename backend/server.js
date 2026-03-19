@@ -12,10 +12,15 @@ connectDB();
 // Trust proxy (EasyPanel/Nginx forwarding)
 app.set('trust proxy', 1);
 
-// CORS — aceita qualquer origem
-app.use(cors());
+// CORS — manual para garantir (antes de TUDO)
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-Key');
+  if (req.method === 'OPTIONS') return res.sendStatus(200);
+  next();
+});
 
-app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(generalLimiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
