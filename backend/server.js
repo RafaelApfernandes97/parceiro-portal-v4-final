@@ -12,15 +12,8 @@ connectDB();
 // Trust proxy (EasyPanel/Nginx forwarding)
 app.set('trust proxy', 1);
 
-// CORS — deve vir antes de tudo
-const corsOrigin = process.env.FRONTEND_URL || 'http://localhost:5173';
-app.use(cors({
-  origin: corsOrigin === '*' ? true : corsOrigin.split(',').map(s => s.trim()),
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key']
-}));
-app.options('*', cors());
+// CORS — aceita qualquer origem
+app.use(cors());
 
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(generalLimiter);
