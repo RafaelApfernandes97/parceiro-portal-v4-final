@@ -12,9 +12,27 @@ connectDB();
 // Trust proxy (EasyPanel/Nginx forwarding)
 app.set('trust proxy', 1);
 
-// CORS — manual para garantir (antes de TUDO)
+// Logger de requisições
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const start = Date.now();
+  const { method, url, headers } = req;
+  console.log(`→ ${method} ${url} | Origin: ${headers.origin || '-'} | IP: ${req.ip}`);
+  res.on('finish', () => {
+    const ms = Date.now() - start;
+    console.log(`← ${method} ${url} | ${res.statusCode} | ${ms}ms`);
+  });
+  next();
+});
+
+// CORS — manual para garantir (antes de TUDO)
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (frontendUrl === '*' || !origin || frontendUrl.split(',').map(s => s.trim()).includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-Key');
   if (req.method === 'OPTIONS') return res.sendStatus(200);
