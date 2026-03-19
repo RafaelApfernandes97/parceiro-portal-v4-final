@@ -9,8 +9,15 @@ const { generalLimiter } = require('./middleware/auth');
 const app = express();
 connectDB();
 
+// Trust proxy (EasyPanel/Nginx forwarding)
+app.set('trust proxy', 1);
+
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173', credentials: true }));
+const corsOrigin = process.env.FRONTEND_URL || 'http://localhost:5173';
+app.use(cors({
+  origin: corsOrigin === '*' ? true : corsOrigin.split(',').map(s => s.trim()),
+  credentials: true
+}));
 app.use(generalLimiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
